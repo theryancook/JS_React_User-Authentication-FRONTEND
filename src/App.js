@@ -1,26 +1,34 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import Signup from './Signup'
+import axios from 'axios'
+import TodoList from './TodoList'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+
+    state = {
+        userToken: null,
+        user: null
+    }
+
+    render(){
+        return (
+            <div>
+                {this.state.user ? (
+                    <TodoList userToken={this.state.userToken}/>
+                ) : (
+                    <Signup onSubmit={async (email, password) => {
+                        const userRes = await axios.post('https://aqueous-inlet-10710.herokuapp.com/users', {user: {email, password}})
+                        const tokenRes = await axios.post('https://aqueous-inlet-10710.herokuapp.com/user_token', {auth: {email, password}})
+                        this.setState({
+                            user: userRes.data,
+                            userToken: tokenRes.data.jwt
+                        })
+                    }}/>
+                )}
+            </div>
+        )
+    }
+
 }
 
-export default App;
+export default App
